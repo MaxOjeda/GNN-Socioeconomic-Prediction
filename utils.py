@@ -9,7 +9,8 @@ from Models.Feature_Propagation import FeaturePropagation
 
 def createPytorchData(G, file_name: str):
     # 1. Cast a flotantes
-    for att in ['beautiful', 'boring', 'depressing', 'lively', 'safe', 'wealthy', 'division', 'ismt']:
+    for att in ['beautiful', 'boring', 'depressing', 'lively', 'safe', 'wealthy', 'division', 'ismt',
+                'houses', 'hog_40pct', 'pct_hog40p', 'ave_gse']:
         for n in G.nodes:
             if att in G.nodes[n]:
                 G.nodes[n][att] = float(G.nodes[n][att])
@@ -33,7 +34,8 @@ def createPytorchData(G, file_name: str):
     for node_id in G.nodes: 
         node_attrs = node_attrs_dict[node_id]
         nodes.append([node_attrs['y'], node_attrs['x'], node_attrs['beautiful'], node_attrs['boring'], node_attrs['depressing'],
-                    node_attrs['lively'], node_attrs['safe'], node_attrs['wealthy'], node_attrs['division'], node_attrs['ismt']])
+                    node_attrs['lively'], node_attrs['safe'], node_attrs['wealthy'], node_attrs['division'], node_attrs['ismt'],
+                    node_attrs['houses'], node_attrs['hog_40pct'], node_attrs['pct_hog40p'], node_attrs['ave_gse']])
     
     print(f"Number of nodes: {len(nodes)}")
     print(f"Number of edges: {len(edges)}")
@@ -53,7 +55,7 @@ def createPytorchData(G, file_name: str):
                 edge_index=edge_index,
                 edge_attributes=edge_attributes)
     
-    torch.save(data, f'../Data/{file_name}.pt')
+    torch.save(data, f'Data/{file_name}.pt')
     print(f"Graph saved as PyTorch in Data/{file_name}.pt")
     
 
