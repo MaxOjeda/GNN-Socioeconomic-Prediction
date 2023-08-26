@@ -13,13 +13,15 @@ class GATClassification(torch.nn.Module):
         self.conv1 = GATConv(input_channels, hidden_channels, heads=self.heads, dropout=self.dropout, edge_dim=self.edge_dim)
         self.convs = torch.nn.ModuleList()
         for _ in range(num_layers - 1):
-            self.convs.append(GATConv(hidden_channels, hidden_channels))
+            self.convs.append(GATConv(hidden_channels*self.heads, hidden_channels*self.heads))
         self.conv2 = GATConv(hidden_channels*self.heads, output_channels, concat=False, dropout=self.dropout)
 
-    def forward(self, data):
-        x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attributes
+    def forward(self, x, edge_index, edge_attr):
         x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.conv1(x, edge_index, edge_attr)
+        if self.edge_dim != None:
+            x = self.conv1(x, edge_index, edge_attr)
+        else:
+            x = self.conv1(x, edge_index)
         x = F.elu(x)
         for conv in self.convs:
             x = F.elu(conv(x, edge_index))

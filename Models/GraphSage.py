@@ -31,7 +31,7 @@ class GraphSageRegression(torch.nn.Module):
 
 class GraphSAGEClassfication(torch.nn.Module):
     def __init__(self, input_channels, hidden_channels, output_channels, num_layers=2, dropout=0.5):
-        super(GraphSAGEClassfication).__init__()
+        super(GraphSAGEClassfication, self).__init__()
         self.drop = dropout
         self.conv1 = SAGEConv(input_channels, hidden_channels)
         self.convs = torch.nn.ModuleList()
