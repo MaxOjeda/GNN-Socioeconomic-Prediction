@@ -113,8 +113,9 @@ def get_feature_propagation(data):
     n_nodes, n_features = data.x.shape
     num_iterations = 40
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
+    #device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cpu'
+    
     missing_feature_mask = torch.where(data.x == 0, 0.0, 1.0).bool().to(device)
     x = data.x.clone()
     x[~missing_feature_mask] = float("nan")
