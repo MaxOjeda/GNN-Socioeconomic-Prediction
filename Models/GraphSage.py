@@ -5,14 +5,14 @@ from torch_geometric.nn import SAGEConv
 
 
 class GraphSageRegression(torch.nn.Module):
-    def __init__(self, input_channels, hidden_channels, output_channels, num_layers=2, dropout=0.5):
+    def __init__(self, input_channels, hidden_channels, output_channels, num_layers=2, dropout=0.5, reduction=1):
         super(GraphSageRegression, self).__init__()
         self.drop = dropout
         self.conv1 = SAGEConv(input_channels, hidden_channels)
         self.convs = torch.nn.ModuleList()
         for _ in range(num_layers - 1):
-            self.convs.append(SAGEConv(hidden_channels, hidden_channels))
-        self.conv2 = SAGEConv(hidden_channels, output_channels)
+            self.convs.append(SAGEConv(hidden_channels, hidden_channels/reduction))
+        self.conv2 = SAGEConv(hidden_channels/reduction, output_channels)
 
     def forward(self, x, edge_index):
         x = F.relu(self.conv1(x, edge_index))

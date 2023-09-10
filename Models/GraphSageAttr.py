@@ -54,13 +54,13 @@ class SAGEConvAttr(MessagePassing):
     
 
 class GraphSAGEAttr(torch.nn.Module):
-    def __init__(self, in_channels, hidden_channels, out_channels, num_layers, dropout):
+    def __init__(self, in_channels, hidden_channels, out_channels, num_layers=2, dropout=0.5, reduction=1):
         super(GraphSAGEAttr,self).__init__()
         self.convs = torch.nn.ModuleList()
         self.convs.append(SAGEConvAttr(in_channels, hidden_channels))
         for _ in range(num_layers - 2):
-            self.convs.append(SAGEConvAttr(hidden_channels, hidden_channels))
-        self.convs.append(SAGEConvAttr(hidden_channels, out_channels))
+            self.convs.append(SAGEConvAttr(hidden_channels, hidden_channels/reduction))
+        self.convs.append(SAGEConvAttr(hidden_channels/reduction, out_channels))
         self.dropout = dropout
 
     def reset_parameters(self):
