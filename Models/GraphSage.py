@@ -5,19 +5,41 @@ from torch_geometric.nn import SAGEConv
 
 
 class GraphSageRegression(torch.nn.Module):
-    def __init__(self, input_channels, hidden_channels, output_channels, num_layers=2, dropout=0.5, reduction=1):
+    def __init__(self, input_channels, hidden_channels, output_channels, num_layers=2, dropout=0.5):
         super(GraphSageRegression, self).__init__()
         self.drop = dropout
         self.conv1 = SAGEConv(input_channels, hidden_channels)
         self.convs = torch.nn.ModuleList()
         for _ in range(num_layers - 1):
-            self.convs.append(SAGEConv(hidden_channels, hidden_channels/reduction))
-        self.conv2 = SAGEConv(hidden_channels/reduction, output_channels)
+            self.convs.append(SAGEConv(hidden_channels, hidden_channels))
+        self.conv2 = SAGEConv(hidden_channels, output_channels)
 
     def forward(self, x, edge_index):
         x = F.relu(self.conv1(x, edge_index))
         for conv in self.convs:
             x = F.relu(conv(x, edge_index))
+        x = F.dropout(x, p=self.drop, training=self.training)
+        x = self.conv2(x, edge_index)
+        return x
+    
+    def reset_parameters(self):
+        self.conv1.reset_parameters()
+        for conv in self.convs:
+            conv.reset_parameters()
+        self.conv2.reset_parameters()
+
+
+class GraphSageRegression2L(torch.nn.Module):
+    def __init__(self, input_channels, hidden_1, hidden_2, output_channels, dropout=0.5):
+        super(GraphSageRegression2L, self).__init__()
+        self.drop = dropout
+        self.conv1 = SAGEConv(input_channels, hidden_1)
+        self.hidden = SAGEConv(hidden_1, hidden_2)
+        self.conv2 = SAGEConv(hidden_2, output_channels)
+
+    def forward(self, x, edge_index):
+        x = F.relu(self.conv1(x, edge_index))
+        x = F.relu(self.hidden(x, edge_index))
         x = F.dropout(x, p=self.drop, training=self.training)
         x = self.conv2(x, edge_index)
         return x

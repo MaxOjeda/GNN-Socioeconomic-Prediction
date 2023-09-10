@@ -54,13 +54,36 @@ class SAGEConvAttr(MessagePassing):
     
 
 class GraphSAGEAttr(torch.nn.Module):
-    def __init__(self, in_channels, hidden_channels, out_channels, num_layers=2, dropout=0.5, reduction=1):
+    def __init__(self, in_channels, hidden_channels, out_channels, num_layers, dropout=0.1):
         super(GraphSAGEAttr,self).__init__()
         self.convs = torch.nn.ModuleList()
         self.convs.append(SAGEConvAttr(in_channels, hidden_channels))
         for _ in range(num_layers - 2):
-            self.convs.append(SAGEConvAttr(hidden_channels, hidden_channels/reduction))
-        self.convs.append(SAGEConvAttr(hidden_channels/reduction, out_channels))
+            self.convs.append(SAGEConvAttr(hidden_channels, hidden_channels))
+        self.convs.append(SAGEConvAttr(hidden_channels, out_channels))
+        self.dropout = dropout
+
+    def reset_parameters(self):
+        for conv in self.convs:
+            conv.reset_parameters()
+
+    def forward(self, x, adj_t, edge_attr):
+        #edge_attr = torch.mm(edge_attr, emb_ea)
+        for conv in self.convs[:-1]:
+            x = conv(x, adj_t, edge_attr)
+            x = F.relu(x)
+            x = F.dropout(x, p=self.dropout, training=self.training)
+        x = self.convs[-1](x, adj_t, edge_attr)
+        return x
+    
+
+class GraphSAGEAttr2L(torch.nn.Module):
+    def __init__(self, in_channels, hidden_1, hidden_2, out_channels, dropout=0.1):
+        super(GraphSAGEAttr2L,self).__init__()
+        self.convs = torch.nn.ModuleList()
+        self.convs.append(SAGEConvAttr(in_channels, hidden_1))
+        self.convs.append(SAGEConvAttr(hidden_1, hidden_2))
+        self.convs.append(SAGEConvAttr(hidden_2, out_channels))
         self.dropout = dropout
 
     def reset_parameters(self):
