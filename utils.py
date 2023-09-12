@@ -10,7 +10,7 @@ from Models.Feature_Propagation import FeaturePropagation
 def createPytorchData(G, file_name: str):
     # 1. Cast a flotantes
     for att in ['beautiful', 'boring', 'depressing', 'lively', 'safe', 'wealthy', 'bc', 'eigen', 'pg_rank', 'division', 'ismt',
-                'houses', 'hog_40pct', 'pct_hog40p', 'ave_gse']:
+                'houses', 'hog_40pct', 'pct_hog40p', 'ave_gse', 'uf']:
         for n in G.nodes:
             if att in G.nodes[n]:
                 G.nodes[n][att] = float(G.nodes[n][att])
@@ -35,7 +35,7 @@ def createPytorchData(G, file_name: str):
         node_attrs = node_attrs_dict[node_id]
         nodes.append([node_attrs['y'], node_attrs['x'], node_attrs['beautiful'], node_attrs['boring'], node_attrs['depressing'],
                     node_attrs['lively'], node_attrs['safe'], node_attrs['wealthy'], node_attrs['bc'], node_attrs['eigen'], node_attrs['pg_rank'], node_attrs['division'], node_attrs['ismt'],
-                    node_attrs['houses'], node_attrs['hog_40pct'], node_attrs['pct_hog40p'], node_attrs['ave_gse']])
+                    node_attrs['houses'], node_attrs['hog_40pct'], node_attrs['pct_hog40p'], node_attrs['ave_gse'], node_attrs['uf']])
     
     print(f"Number of nodes: {len(nodes)}")
     print(f"Number of edges: {len(edges)}")
