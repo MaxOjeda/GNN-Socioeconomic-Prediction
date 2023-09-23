@@ -29,7 +29,7 @@ def createPytorchData(G, file_name: str):
 
     for source, target, edge_attrs in G.edges(data=True):
         edges.append([source, target])
-        edge_attributes.append([float(edge_attrs['length']), float(edge_attrs['travel_time'])])
+        edge_attributes.append([float(edge_attrs['length']), float(edge_attrs['travel_time']), float(edge_attrs['highway']), float(edge_attrs['speed_kph'])])
 
     for node_id in G.nodes: 
         node_attrs = node_attrs_dict[node_id]
