@@ -57,6 +57,56 @@ def createPytorchData(G, file_name: str):
     
     torch.save(data, f'Data/{file_name}.pt')
     print(f"Graph saved as PyTorch in Data/{file_name}.pt")
+
+
+def createPytorchDataTemuco(G, file_name: str):
+    # 1. Cast a flotantes
+    for att in ['beautiful', 'boring', 'depressing', 'lively', 'safe', 'wealthy', 'division', 'ismt']:
+        for n in G.nodes:
+            if att in G.nodes[n]:
+                G.nodes[n][att] = float(G.nodes[n][att])
+
+    # 2. Crear un diccionario de atributos de nodos
+    node_attrs_dict = {}
+
+    for node_id in G.nodes:
+        node_attrs = G.nodes[node_id]
+        node_attrs_dict[node_id] = {**node_attrs}
+
+    # 3. Crear listas de nodos y aristas
+    nodes = []
+    edges = []
+    edge_attributes = []
+
+    for source, target, edge_attrs in G.edges(data=True):
+        edges.append([source, target])
+        edge_attributes.append([float(edge_attrs['length']), float(edge_attrs['travel_time']), float(edge_attrs['speed_kph'])])
+
+    for node_id in G.nodes: 
+        node_attrs = node_attrs_dict[node_id]
+        nodes.append([node_attrs['y'], node_attrs['x'], node_attrs['beautiful'], node_attrs['boring'], node_attrs['depressing'],
+                    node_attrs['lively'], node_attrs['safe'], node_attrs['wealthy'], node_attrs['division'], node_attrs['ismt']])
+    
+    print(f"Number of nodes: {len(nodes)}")
+    print(f"Number of edges: {len(edges)}")
+    print(f"Number of edge attributes: {len(edge_attributes)}")
+    
+    # 4. Crear objeto Data de PyTorch Geometric
+    x = torch.tensor(nodes, dtype=torch.float)
+    edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+    edge_attributes = torch.tensor(edge_attributes, dtype=torch.float)
+
+    print(f"Size of x tensor: {x.size()}")
+    print(f"Size of edge_index tensor: {edge_index.size()}")
+    print(f"Size of edge_attributes tensor: {edge_attributes.size()}")
+    
+    # Crear el objeto Data para el grafo
+    data = Data(x=x,
+                edge_index=edge_index,
+                edge_attributes=edge_attributes)
+    
+    torch.save(data, f'Data/{file_name}.pt')
+    print(f"Graph saved as PyTorch in Data/{file_name}.pt")
     
 
 def random_filling(X):

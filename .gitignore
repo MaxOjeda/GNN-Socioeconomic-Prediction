@@ -124,6 +124,8 @@ celerybeat.pid
 *.shp
 Data/Comunas/
 Data/ISMT/
+Data/ISMT_Temuco/
+Data/temuco_ismtpn_knn.csv
 # Environments
 .env
 .venv
